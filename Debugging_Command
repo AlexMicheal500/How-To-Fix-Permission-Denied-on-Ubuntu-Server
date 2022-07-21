@@ -1,0 +1,29 @@
+Fixing ‘Got permission denied while trying to connect to the Docker daemon socket’ error with Docker in Ubuntu
+There are two ways to deal with it.
+
+Fix 1: Run all the docker commands with sudo
+If you have sudo access on your system, you may run each docker command with sudo and you won’t see this ‘Got permission denied while trying to connect to the Docker daemon socket’ anymore.
+
+sudo docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS               NAMES
+13dc0f4226dc        ubuntu              "bash"              17 hours ago        Exited (0) 16 hours ago                       container-2
+2d9a8c190e6c        ubuntu              "/bin/bash"         17 hours ago        Created                                       container-1
+But running each and every docker command with sudo is super inconvenient. You miss adding sudo to the beginning and you’ll get ‘permission denied’ error again.
+
+Fix 2: Running docker commands without sudo
+To run the docker commands without sudo, you can add your user account (or the account you are trying to fix this problem for) to the docker group.
+
+First, create the docker group using groupadd command. The group may already exist but running the group creation command won’t hurt.
+
+sudo groupadd docker
+Now that you have the docker group, add your user to this group with the usermod command. I am assuming that you are trying to do it for your own user account and in that case, you can use the $USER variable.
+
+sudo usermod -aG docker $USER
+Verify that your user has been added to docker group by listing the users of the group. You probably have to log out and log in back again.
+
+abhishek@itsfoss:~$ groups
+abhishek adm cdrom sudo dip plugdev lpadmin sambashare docker
+If you check your groups and docker groups is not listed even after logging out, you may have to restart Ubuntu. To avoid that, you can use the newgrp command liks this:
+
+newgrp docker
+Now if you try running the docker commands without sudo, it should work just fine.
